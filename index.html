@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#f7dce8">
+		<title>Elsa's Pink Closet | Phòng thử đồ công chúa</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--rose: #d85483;
+			--deep-rose: #a93161;
+			--ink: #653c50;
+			--paper: #fff8fb;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			min-height: 100vh;
+			margin: 0;
+			overflow: hidden;
+			color: var(--ink);
+			font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+			background:
+				radial-gradient(ellipse at 12% 18%, #fff9fc 0 3%, transparent 24%),
+				radial-gradient(ellipse at 87% 78%, #f4bfd4 0 2%, transparent 27%),
+				repeating-linear-gradient(135deg, transparent 0 24px, #fff5f929 25px 26px),
+				linear-gradient(145deg, #fceaf1, #f5d3e2 55%, #fbeaf2);
+			transition: background 1s ease, color 1s ease;
+		}
+
+		body::before, body::after {
+			position: fixed;
+			z-index: 0;
+			color: #bd6488;
+			font-family: Georgia, serif;
+			pointer-events: none;
+			opacity: .5;
+		}
+
+		body::before {
+			content: "❀  ✿   ❁";
+			top: 5vh;
+			left: 4vw;
+			font-size: clamp(1.5rem, 4vw, 3.5rem);
+			transform: rotate(-15deg);
+		}
+
+		body::after {
+			content: "✿   ❀  ❁";
+			right: 4vw;
+			bottom: 5vh;
+			font-size: clamp(1.5rem, 4vw, 3.5rem);
+			transform: rotate(14deg);
+		}
+
+		.question-screen, .galaxy-screen {
+			position: relative;
+			z-index: 1;
+			display: grid;
+			min-height: 100svh;
+			place-items: center;
+			padding: 28px;
+		}
+
+		.question-card {
+			position: relative;
+			width: min(100%, 620px);
+			padding: clamp(34px, 7vw, 66px) clamp(22px, 7vw, 66px) 48px;
+			text-align: center;
+			background: #fff9fcdf;
+			border: 1px solid #fff;
+			border-radius: 46% 46% 22px 22px / 18% 18% 22px 22px;
+			box-shadow: 0 22px 65px #a54a7020, inset 0 0 0 8px #f8dce8a8;
+			animation: arrive .8s both cubic-bezier(.2,.8,.2,1);
+		}
+
+		.question-card::before {
+			content: "✿";
+			display: block;
+			margin-bottom: 13px;
+			color: var(--rose);
+			font-size: 35px;
+		}
+
+		.eyebrow {
+			margin: 0 0 15px;
+			color: #b96383;
+			font-family: "Trebuchet MS", sans-serif;
+			font-size: .72rem;
+			letter-spacing: .18em;
+			text-transform: uppercase;
+		}
+
+		h1 {
+			max-width: 500px;
+			margin: 0 auto 32px;
+			color: #773f5b;
+			font-size: clamp(1.8rem, 5vw, 3rem);
+			font-weight: 500;
+			line-height: 1.25;
+		}
+
+		.answers {
+			display: flex;
+			justify-content: center;
+			gap: 16px;
+			min-height: 58px;
+		}
+
+		button {
+			min-width: 132px;
+			padding: 14px 25px;
+			border: 0;
+			border-radius: 999px;
+			font: 600 1rem "Trebuchet MS", sans-serif;
+			cursor: pointer;
+			transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+		}
+
+		#yes-button {
+			color: white;
+			background: linear-gradient(135deg, #e47da2, #ca4f7c);
+			box-shadow: 0 8px 18px #c14e792e;
+		}
+
+		#yes-button:hover { transform: translateY(-3px); box-shadow: 0 12px 24px #c14e7940; }
+
+		#no-button {
+			position: relative;
+			color: #a64d70;
+			background: #f7e1eb;
+			border: 1px solid #efc8d8;
+			touch-action: none;
+		}
+
+		.tiny-note {
+			margin: 24px 0 0;
+			color: #a97a8d;
+			font-size: .94rem;
+			font-style: italic;
+		}
+
+		.galaxy-screen {
+			position: fixed;
+			inset: 0;
+			display: none;
+			overflow: hidden;
+			padding: 0;
+			color: #fff2f8;
+			background:
+				radial-gradient(ellipse at 50% 52%, #381943 0, #17132e 42%, #090d20 100%);
+		}
+
+		.galaxy-screen::before, .galaxy-screen::after {
+			position: absolute;
+			content: "";
+			width: 70vmax;
+			height: 70vmax;
+			border: 1px solid #cf80e522;
+			border-radius: 50%;
+			box-shadow: 0 0 90px #b64da31a, inset 0 0 90px #b64da314;
+			animation: orbit 35s linear infinite;
+		}
+
+		.galaxy-screen::after {
+			width: 90vmax;
+			height: 90vmax;
+			border-color: #80c9f01b;
+			animation-direction: reverse;
+			animation-duration: 48s;
+		}
+
+		#star-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+		.wish {
+			position: relative;
+			z-index: 1;
+			width: min(90vw, 700px);
+			margin: min(58vh, 520px) 20px 0;
+			text-align: center;
+			color: #fff4fa;
+			font-size: clamp(1.35rem, 4vw, 2.15rem);
+			line-height: 1.4;
+			text-shadow: 0 2px 22px #f3a0d5a8;
+			animation: arrive 1.3s .4s both;
+		}
+
+		body.celebrating { color: white; background: #090d20; }
+		body.celebrating::before, body.celebrating::after { opacity: 0; }
+		body.celebrating .galaxy-screen { display: grid; }
+		body.celebrating .question-screen { display: none; }
+
+		@keyframes arrive {
+			from { opacity: 0; transform: translateY(16px) scale(.98); }
+			to { opacity: 1; transform: translateY(0) scale(1); }
+		}
+
+		@keyframes orbit { to { transform: rotate(360deg); } }
+
+		@media (max-width: 480px) {
+			.question-card { border-radius: 43% 43% 20px 20px / 11% 11% 20px 20px; }
+			.answers { gap: 10px; }
+			button { min-width: 118px; padding-inline: 18px; }
+			.wish { margin-top: 57vh; }
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+		}
+
+		:root {
+			--rose: #c84e7d;
+			--berry: #783653;
+			--ink: #553b49;
+			--muted: #a68191;
+			--pink: #f6dbe6;
+			--petal: #fff8fb;
+		}
+
+		body {
+			min-width: 320px;
+			min-height: 100vh;
+			min-height: 100svh;
+			overflow: auto;
+			color: var(--ink);
+			font-family: "Trebuchet MS", sans-serif;
+			background-color: #f8e9ef;
+			background-image: radial-gradient(ellipse at 10% 10%, #fff9fc 0, transparent 30%), radial-gradient(ellipse at 91% 82%, #efc9d8 0, transparent 33%), repeating-linear-gradient(135deg, transparent 0 30px, #ffffff28 31px 32px);
+		}
+
+		body::before, body::after { content: none; }
+		button { min-width: 0; padding: 0; border-radius: 0; font-family: inherit; }
+
+		.app-shell {
+			width: min(1440px, 100%);
+			min-height: 100svh;
+			margin: 0 auto;
+			padding: 24px clamp(18px, 4vw, 58px) 28px;
+		}
+
+		.topbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 18px;
+			padding-bottom: 19px;
+			border-bottom: 1px solid #d9b8c6;
+		}
+
+		.brand { display: flex; align-items: center; gap: 11px; }
+		.brand-mark { color: var(--rose); font-size: 27px; line-height: 1; }
+		.brand-name { color: var(--berry); font: 600 20px "Palatino Linotype", "Book Antiqua", Georgia, serif; }
+		.brand-note { margin-top: 3px; color: var(--muted); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+		.topbar-note { color: var(--muted); font: italic 15px "Palatino Linotype", Georgia, serif; }
+
+		.workspace {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 304px;
+			gap: clamp(22px, 4vw, 58px);
+			align-items: center;
+			min-height: calc(100svh - 91px);
+			padding: 25px 0 18px;
+		}
+
+		.dressing-room { min-width: 0; text-align: center; }
+		.eyebrow { margin: 0 0 7px; color: var(--rose); font-size: 10px; letter-spacing: .22em; text-transform: uppercase; }
+		h1 { margin: 0; color: var(--berry); font: 500 clamp(28px, 4vw, 43px)/1.1 "Palatino Linotype", "Book Antiqua", Georgia, serif; }
+		.subtitle { margin: 9px 0 18px; color: #927183; font: italic 15px "Palatino Linotype", Georgia, serif; }
+
+		.stage {
+			position: relative;
+			display: grid;
+			min-height: min(60vh, 520px);
+			min-height: min(60svh, 520px);
+			place-items: end center;
+			overflow: hidden;
+			isolation: isolate;
+			background: radial-gradient(ellipse at 50% 75%, #fff7fa 0 16%, transparent 52%), linear-gradient(180deg, #f8e5ed 0%, #f2d6e2 100%);
+			border: 1px solid #fff;
+			border-radius: 48% 48% 5px 5px / 16% 16% 5px 5px;
+			box-shadow: 0 18px 45px #9f4c6b15, inset 0 0 0 8px #fff4f862;
+		}
+
+		.stage::before, .stage::after {
+			position: absolute;
+			z-index: -1;
+			content: "";
+			width: 34%;
+			height: 88%;
+			top: 7%;
+			border: 1px solid #fff8;
+			border-radius: 50% 50% 0 0;
+			background: repeating-linear-gradient(90deg, #e9b9cc48 0 16px, #fff7fa38 17px 32px);
+			box-shadow: 0 0 24px #fff9 inset;
+		}
+		.stage::before { left: -22%; }
+		.stage::after { right: -22%; }
+		.stage-sparkle { position: absolute; color: #fff; font-size: 23px; animation: twinkle 2.3s ease-in-out infinite alternate; }
+		.sparkle-a { top: 18%; left: 20%; }
+		.sparkle-b { top: 29%; right: 19%; animation-delay: .8s; }
+		.sparkle-c { top: 49%; left: 14%; animation-delay: 1.3s; }
+
+		.model {
+			--dress: #9edfe8;
+			--dress-light: #e2fbff;
+			--dress-deep: #62b7c5;
+			position: relative;
+			width: 250px;
+			height: 405px;
+			margin-bottom: 4px;
+			transform-origin: center bottom;
+			animation: arrive .8s both;
+		}
+		.hair {
+			position: absolute;
+			z-index: 2;
+			top: 19px;
+			left: 68px;
+			width: 115px;
+			height: 145px;
+			border-radius: 54% 48% 42% 48%;
+			background: linear-gradient(100deg, #d6a752, #f8d783 52%, #c68c39);
+			box-shadow: 10px 28px 0 -1px #e5bb68, -12px 26px 0 -2px #dfb25a;
+		}
+		.face {
+			position: absolute;
+			z-index: 3;
+			top: 34px;
+			left: 85px;
+			width: 83px;
+			height: 104px;
+			border-radius: 47% 47% 45% 45%;
+			background: linear-gradient(110deg, #ffe1cd, #f8c9b5);
+			box-shadow: inset 5px 0 #fff4e640;
+		}
+		.face::before {
+			position: absolute;
+			content: "•  •";
+			top: 39px;
+			left: 22px;
+			color: #593e49;
+			font: 700 14px Georgia, serif;
+			letter-spacing: 8px;
+		}
+		.face::after {
+			position: absolute;
+			content: "⌣";
+			top: 55px;
+			left: 34px;
+			color: #bd6c7d;
+			font: 17px Georgia, serif;
+		}
+		.crown {
+			position: absolute;
+			z-index: 5;
+			top: 4px;
+			left: 101px;
+			color: #d39b36;
+			font-size: 39px;
+			line-height: 1;
+			filter: drop-shadow(0 2px 2px #a9772838);
+			transition: opacity .25s, transform .25s;
+		}
+		.neck { position: absolute; z-index: 2; top: 127px; left: 112px; width: 30px; height: 37px; background: #f4c6b0; }
+		.bodice {
+			position: absolute;
+			z-index: 4;
+			top: 144px;
+			left: 79px;
+			width: 97px;
+			height: 127px;
+			clip-path: polygon(28% 0, 72% 0, 100% 100%, 0 100%);
+			background: linear-gradient(90deg, var(--dress-deep), var(--dress-light) 48%, var(--dress));
+			transition: background .35s;
+		}
+		.bodice::after { position: absolute; content: "✧"; top: 34px; left: 39px; color: #fffde6; font-size: 20px; text-shadow: 0 0 9px #fff; }
+		.sleeve { position: absolute; z-index: 3; top: 154px; width: 39px; height: 52px; border-radius: 50%; background: var(--dress-light); }
+		.sleeve-left { left: 59px; transform: rotate(25deg); }
+		.sleeve-right { right: 57px; transform: rotate(-25deg); }
+		.skirt {
+			position: absolute;
+			z-index: 3;
+			top: 239px;
+			left: 22px;
+			width: 207px;
+			height: 160px;
+			clip-path: polygon(39% 0, 61% 0, 100% 100%, 0 100%);
+			background: repeating-linear-gradient(78deg, transparent 0 36px, #ffffff50 37px 39px), linear-gradient(100deg, var(--dress-deep), var(--dress-light) 49%, var(--dress));
+			filter: drop-shadow(0 8px 4px #81475c2b);
+			transition: background .35s;
+		}
+		.cape {
+			position: absolute;
+			z-index: 1;
+			top: 153px;
+			left: 39px;
+			width: 172px;
+			height: 235px;
+			clip-path: polygon(23% 0, 77% 0, 100% 100%, 0 100%);
+			background: linear-gradient(100deg, #fff9fcaa, #e2b0cfb8 48%, #fff9fca8);
+			transform-origin: 50% 0;
+			transition: opacity .25s, transform .25s;
+		}
+		.earring { position: absolute; z-index: 5; top: 91px; left: 78px; width: 8px; height: 13px; border: 2px solid #e9c46b; border-radius: 50%; }
+		.earring::after { position: absolute; top: 0; left: 83px; width: 8px; height: 13px; border: 2px solid #e9c46b; border-radius: 50%; content: ""; }
+		.model[data-dress="rose"] { --dress: #ec8faf; --dress-light: #ffe0e9; --dress-deep: #c94d79; }
+		.model[data-dress="lilac"] { --dress: #c5a0d7; --dress-light: #f4e6fb; --dress-deep: #8a62a3; }
+		.model[data-dress="gold"] { --dress: #e8c96c; --dress-light: #fff2c2; --dress-deep: #bd9440; }
+		.model.no-cape .cape { opacity: 0; transform: scaleY(.7); }
+		.model.no-crown .crown { opacity: 0; transform: translateY(-10px); }
+		.stage-caption { position: absolute; right: 0; bottom: 13px; left: 0; color: #a87d90; font: italic 13px "Palatino Linotype", Georgia, serif; }
+
+		.dress-panel { padding: 25px 0; border-top: 1px solid #d9b8c6; text-align: left; }
+		.panel-topline { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+		h2 { margin: 0; color: var(--berry); font: 500 23px "Palatino Linotype", Georgia, serif; }
+		.look-count { color: var(--muted); font-size: 11px; }
+		.panel-label { margin: 23px 0 11px; color: #9c7185; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+		.dress-options { display: grid; gap: 8px; }
+		.dress-option {
+			display: grid;
+			grid-template-columns: 42px 1fr auto;
+			align-items: center;
+			gap: 11px;
+			width: 100%;
+			min-height: 62px;
+			padding: 8px 10px;
+			color: var(--ink);
+			text-align: left;
+			background: #fff9fc86;
+			border: 1px solid transparent;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: border-color .2s, background .2s, transform .2s;
+		}
+		.dress-option:hover { transform: translateX(3px); background: #fffafd; }
+		.dress-option[aria-pressed="true"] { background: #fffafd; border-color: #d17a9a; box-shadow: 0 4px 14px #a94f7012; }
+		.dress-swatch { width: 38px; height: 43px; clip-path: polygon(34% 0, 66% 0, 76% 29%, 100% 100%, 0 100%, 24% 29%); background: var(--swatch); }
+		.dress-title { display: block; font: 600 14px "Palatino Linotype", Georgia, serif; }
+		.dress-description { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+		.option-check { color: var(--rose); font-size: 15px; opacity: 0; }
+		.dress-option[aria-pressed="true"] .option-check { opacity: 1; }
+		.color-row { display: flex; align-items: center; gap: 10px; }
+		.color-chip { width: 31px; height: 31px; padding: 0; background: var(--chip); border: 3px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px #dfbfcc; cursor: pointer; }
+		.color-chip[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--berry); }
+		.accessories { display: grid; gap: 5px; }
+		.accessory {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			min-height: 43px;
+			padding: 0;
+			color: var(--ink);
+			background: transparent;
+			border: 0;
+			border-bottom: 1px solid #ead2dc;
+			font-size: 13px;
+			text-align: left;
+			cursor: pointer;
+		}
+		.switch { position: relative; width: 34px; height: 19px; background: #e5cbd6; border-radius: 20px; transition: background .2s; }
+		.switch::after { position: absolute; top: 3px; left: 3px; width: 13px; height: 13px; content: ""; background: white; border-radius: 50%; transition: transform .2s; }
+		.accessory[aria-pressed="true"] .switch { background: #d76f94; }
+		.accessory[aria-pressed="true"] .switch::after { transform: translateX(15px); }
+		.actions { display: flex; gap: 9px; margin-top: 22px; }
+		.action-button { min-height: 43px; padding: 0 14px; border: 1px solid #d9a9bd; border-radius: 3px; color: var(--berry); background: transparent; font-size: 12px; cursor: pointer; transition: background .2s, transform .2s; }
+		.action-button:hover { transform: translateY(-2px); background: #fff8fb; }
+		.action-button.primary { flex: 1; color: white; background: var(--rose); border-color: var(--rose); }
+		.action-button.primary:hover { background: #b9416e; }
+		.toast { position: fixed; z-index: 10; bottom: 24px; left: 50%; padding: 12px 18px; color: white; background: #75405a; border-radius: 3px; box-shadow: 0 8px 25px #43203330; opacity: 0; transform: translate(-50%, 12px); pointer-events: none; transition: opacity .25s, transform .25s; }
+		.toast.visible { opacity: 1; transform: translate(-50%, 0); }
+
+		@keyframes twinkle { to { opacity: .45; transform: scale(.78) rotate(25deg); } }
+		@media (min-width: 1100px) { .workspace { grid-template-columns: minmax(0, 1fr) 328px; } }
+		@media (max-width: 760px) {
+			.app-shell { padding: 17px 18px 24px; }
+			.topbar-note { display: none; }
+			.workspace { grid-template-columns: 1fr; gap: 18px; padding-top: 22px; }
+			.stage { min-height: 410px; min-height: min(55svh, 460px); }
+			.dress-panel { padding: 20px 2px; }
+			.dress-options { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+			.dress-option { grid-template-columns: 30px 1fr; gap: 7px; min-height: 58px; padding: 7px; }
+			.dress-swatch { width: 29px; height: 36px; }
+			.dress-title { font-size: 12px; }
+			.dress-description { font-size: 10px; }
+			.option-check { display: none; }
+		}
+		@media (max-width: 420px) {
+			.brand-name { font-size: 18px; }
+			.brand-note { font-size: 9px; }
+			.stage { min-height: 390px; }
+			.model { transform: scale(.9); transform-origin: center bottom; }
+			.actions { gap: 7px; }
+			.action-button { padding: 0 10px; font-size: 11px; }
+		}
+	</style>
+</head>
+<body>
+	<main class="app-shell">
+		<header class="topbar">
+			<div class="brand">
+				<span class="brand-mark" aria-hidden="true">✿</span>
+				<div>
+					<div class="brand-name">Elsa's Pink Closet</div>
+					<div class="brand-note">Royal dressing room</div>
+				</div>
+			</div>
+			<p class="topbar-note">Một chút lấp lánh, thật nhiều dịu dàng ♡</p>
+		</header>
+
+		<div class="workspace">
+			<section class="dressing-room" aria-labelledby="page-title">
+				<p class="eyebrow">Bộ sưu tập mùa đông</p>
+				<h1 id="page-title">Phòng thử đồ của Elsa</h1>
+				<p class="subtitle">Chọn một chiếc váy thật xinh cho nàng công chúa nhé</p>
+				<div class="stage" aria-label="Elsa trong bộ trang phục đang chọn">
+					<span class="stage-sparkle sparkle-a" aria-hidden="true">✦</span>
+					<span class="stage-sparkle sparkle-b" aria-hidden="true">✧</span>
+					<span class="stage-sparkle sparkle-c" aria-hidden="true">✧</span>
+					<div class="model" id="model" data-dress="ice" aria-label="Elsa mặc váy băng tuyết">
+						<div class="hair"></div>
+						<div class="face"></div>
+						<div class="crown" aria-hidden="true">♛</div>
+						<div class="earring" aria-hidden="true"></div>
+						<div class="neck"></div>
+						<div class="cape" aria-hidden="true"></div>
+						<div class="sleeve sleeve-left"></div>
+						<div class="sleeve sleeve-right"></div>
+						<div class="bodice"></div>
+						<div class="skirt"></div>
+					</div>
+					<div class="stage-caption" id="stage-caption">Nàng thơ băng tuyết</div>
+				</div>
+			</section>
+
+			<aside class="dress-panel" aria-label="Tùy chọn trang phục">
+				<div class="panel-topline">
+					<h2>Tủ đồ của nàng</h2>
+					<span class="look-count">03 kiểu váy</span>
+				</div>
+				<p class="panel-label">Chọn kiểu váy</p>
+				<div class="dress-options" role="group" aria-label="Kiểu váy">
+					<button class="dress-option" type="button" data-dress="ice" aria-pressed="true">
+						<span class="dress-swatch" style="--swatch: linear-gradient(120deg,#62b7c5,#e2fbff)"></span>
+						<span><span class="dress-title">Băng tuyết</span><span class="dress-description">Lấp lánh dịu êm</span></span>
+						<span class="option-check" aria-hidden="true">♡</span>
+					</button>
+					<button class="dress-option" type="button" data-dress="rose" aria-pressed="false">
+						<span class="dress-swatch" style="--swatch: linear-gradient(120deg,#c94d79,#ffe0e9)"></span>
+						<span><span class="dress-title">Hồng mộng mơ</span><span class="dress-description">Ngọt ngào kiêu sa</span></span>
+						<span class="option-check" aria-hidden="true">♡</span>
+					</button>
+					<button class="dress-option" type="button" data-dress="lilac" aria-pressed="false">
+						<span class="dress-swatch" style="--swatch: linear-gradient(120deg,#8a62a3,#f4e6fb)"></span>
+						<span><span class="dress-title">Tím hoa cà</span><span class="dress-description">Mơ màng cổ tích</span></span>
+						<span class="option-check" aria-hidden="true">♡</span>
+					</button>
+				</div>
+
+				<p class="panel-label">Sắc màu yêu thích</p>
+				<div class="color-row" role="group" aria-label="Sắc màu yêu thích">
+					<button class="color-chip" type="button" style="--chip:#8ed9e3" data-color="ice" aria-label="Màu xanh băng" aria-pressed="true"></button>
+					<button class="color-chip" type="button" style="--chip:#e985a7" data-color="rose" aria-label="Màu hồng phấn" aria-pressed="false"></button>
+					<button class="color-chip" type="button" style="--chip:#b994ce" data-color="lilac" aria-label="Màu tím hoa cà" aria-pressed="false"></button>
+					<button class="color-chip" type="button" style="--chip:#e4c45d" data-color="gold" aria-label="Màu vàng ánh kim" aria-pressed="false"></button>
+				</div>
+
+				<p class="panel-label">Phụ kiện</p>
+				<div class="accessories">
+					<button class="accessory" type="button" data-accessory="crown" aria-pressed="true"><span>Vương miện pha lê</span><span class="switch" aria-hidden="true"></span></button>
+					<button class="accessory" type="button" data-accessory="cape" aria-pressed="true"><span>Áo choàng tuyết</span><span class="switch" aria-hidden="true"></span></button>
+				</div>
+				<div class="actions">
+					<button class="action-button" id="randomize" type="button">Phối ngẫu nhiên</button>
+					<button class="action-button primary" id="save-look" type="button">Lưu bộ đồ ♡</button>
+				</div>
+			</aside>
+		</div>
+	</main>
+	<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+	<script>
+		const model = document.querySelector("#model");
+		const caption = document.querySelector("#stage-caption");
+		const toast = document.querySelector("#toast");
+		const dressNames = { ice: "Băng tuyết", rose: "Hồng mộng mơ", lilac: "Tím hoa cà", gold: "Ánh kim hoàng gia" };
+		let toastTimer;
+
+		function selectDress(dress) {
+			model.dataset.dress = dress;
+			model.setAttribute("aria-label", `Elsa mặc váy ${dressNames[dress]}`);
+			caption.textContent = dress === "ice" ? "Nàng thơ băng tuyết" : dressNames[dress];
+			document.querySelectorAll(".dress-option").forEach((button) => {
+				button.setAttribute("aria-pressed", String(button.dataset.dress === dress));
+			});
+			document.querySelectorAll(".color-chip").forEach((button) => {
+				button.setAttribute("aria-pressed", String(button.dataset.color === dress));
+			});
+		}
+
+		document.querySelectorAll(".dress-option").forEach((button) => {
+			button.addEventListener("click", () => selectDress(button.dataset.dress));
+		});
+		document.querySelectorAll(".color-chip").forEach((button) => {
+			button.addEventListener("click", () => selectDress(button.dataset.color));
+		});
+		document.querySelectorAll(".accessory").forEach((button) => {
+			button.addEventListener("click", () => {
+				const isOn = button.getAttribute("aria-pressed") === "true";
+				button.setAttribute("aria-pressed", String(!isOn));
+				model.classList.toggle(`no-${button.dataset.accessory}`, isOn);
+			});
+		});
+
+		function showToast(message) {
+			toast.textContent = message;
+			toast.classList.add("visible");
+			window.clearTimeout(toastTimer);
+			toastTimer = window.setTimeout(() => toast.classList.remove("visible"), 2200);
+		}
+
+		function restoreSavedLook() {
+			try {
+				const savedLook = JSON.parse(localStorage.getItem("elsa-pink-closet-look"));
+				if (!savedLook) return;
+				if (dressNames[savedLook.dress]) selectDress(savedLook.dress);
+				for (const button of document.querySelectorAll(".accessory")) {
+					const isOn = savedLook.accessories?.[button.dataset.accessory] !== false;
+					button.setAttribute("aria-pressed", String(isOn));
+					model.classList.toggle(`no-${button.dataset.accessory}`, !isOn);
+				}
+			} catch {
+				return;
+			}
+		}
+
+		document.querySelector("#save-look").addEventListener("click", () => {
+			const accessories = Object.fromEntries([...document.querySelectorAll(".accessory")].map((button) => [button.dataset.accessory, button.getAttribute("aria-pressed") === "true"]));
+			try {
+				localStorage.setItem("elsa-pink-closet-look", JSON.stringify({ dress: model.dataset.dress, accessories }));
+				showToast(`Đã lưu bộ váy ${dressNames[model.dataset.dress]} ♡`);
+			} catch {
+				showToast("Trình duyệt chưa thể lưu bộ đồ này");
+			}
+		});
+		document.querySelector("#randomize").addEventListener("click", () => {
+			const outfits = ["ice", "rose", "lilac", "gold"];
+			selectDress(outfits[Math.floor(Math.random() * outfits.length)]);
+			[...document.querySelectorAll(".accessory")].forEach((button) => {
+				const isOn = Math.random() > .25;
+				button.setAttribute("aria-pressed", String(isOn));
+				model.classList.toggle(`no-${button.dataset.accessory}`, !isOn);
+			});
+			showToast("Elsa đã có một diện mạo mới!");
+		});
+		restoreSavedLook();
+	</script>
+</body>
+</html>
