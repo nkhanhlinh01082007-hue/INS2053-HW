@@ -1,0 +1,131 @@
+/* CSS Reset */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+/* Body */
+body{
+    font-family: Arial, sans-serif;
+    background-color:#fff6fa;
+    color:#333;
+    width:100%;
+}
+
+/* Header */
+header{
+    background-color:#ff6fa5;
+    color:white;
+    text-align:center;
+    padding:25px;
+}
+
+/* Navigation */
+nav{
+    background-color:#ffb3cf;
+}
+
+nav ul{
+    list-style:none;
+    display:flex;
+    justify-content:center;
+}
+
+nav li{
+    margin:15px;
+}
+
+nav a{
+    text-decoration:none;
+    color:#5a2142;
+    font-weight:bold;
+}
+
+nav a:hover{
+    color:#ffffff;
+}
+
+/* Main Layout */
+.container{
+    max-width:900px;
+    margin:20px auto;
+    padding:0 20px;
+
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+}
+
+/* Main Content */
+main{
+    width:70%;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+main h2{
+    color:#ff4f8a;
+    margin-bottom:15px;
+}
+
+main p{
+    margin-bottom:15px;
+    line-height:1.6;
+}
+
+/* Aside */
+aside{
+    width:25%;
+    background:#ffe4ef;
+    padding:20px;
+    border-radius:10px;
+}
+
+aside h3{
+    color:#ff4f8a;
+    margin-bottom:10px;
+}
+
+aside ul{
+    list-style:none;
+    margin-bottom:15px;
+}
+
+aside li{
+    margin-bottom:8px;
+}
+
+/* Footer */
+footer{
+    background-color:#d94c84;
+    color:white;
+    text-align:center;
+    padding:20px;
+    margin-top:20px;
+}
+
+footer a{
+    color:white;
+    text-decoration:none;
+}
+
+/* Responsive */
+@media(max-width:768px){
+
+    .container{
+        flex-direction:column;
+    }
+
+    main,
+    aside{
+        width:100%;
+    }
+
+    nav ul{
+        flex-direction:column;
+        align-items:center;
+    }
+}
